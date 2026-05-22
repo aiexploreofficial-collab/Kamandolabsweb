@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-[#0A0A0A] text-white overflow-x-hidden;
+  }
+
+  ::selection {
+    @apply bg-red-600/30 text-white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-[#0A0A0A];
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-800 hover:bg-neutral-700 transition-colors;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply outline-none bg-[#111111] border border-neutral-800 rounded-none text-white focus:border-red-600 transition-colors;
+  }
+}
+
+@layer components {
+  /* Mapping legacy glass classes to tactical matte styles for compatibility and instant redesign */
+  .glass {
+    @apply bg-[#111111] border border-neutral-800;
+  }
+
+  .glass-card {
+    @apply bg-[#111111] border border-neutral-800 rounded-none;
+  }
+
+  .glass-card-hover {
+    @apply hover:border-neutral-700 hover:bg-[#141414] transition-all duration-300;
+  }
+
+  .text-gradient-white {
+    @apply text-white;
+  }
+
+  .text-gradient-red {
+    @apply text-red-600;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-24 lg:py-28;
+  }
+
+  .container-main {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wider text-xs px-8 py-3.5 rounded-none transition-all duration-300 select-none;
+  }
+
+  .btn-secondary {
+    @apply relative inline-flex items-center justify-center gap-2 bg-[#111111] hover:bg-[#161616] border border-neutral-800 text-white font-bold uppercase tracking-wider text-xs px-8 py-3.5 rounded-none transition-all duration-300 select-none;
+  }
+
+  .glow-red {
+    box-shadow: none;
+  }
+
+  .glow-red-strong {
+    box-shadow: none;
+  }
+
+  .grid-bg {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .noise-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Tactical custom styles */
+  .kmd-card {
+    @apply bg-[#111111] border border-neutral-800 rounded-none;
+  }
+
+  .kmd-card-accent {
+    @apply bg-[#111111] border border-neutral-800 border-l-2 border-l-red-600 rounded-none;
+  }
+
+  .kmd-badge {
+    @apply bg-red-600 text-white text-[10px] font-black uppercase px-2 py-0.5 tracking-wider rounded-none select-none;
+  }
+}
+
