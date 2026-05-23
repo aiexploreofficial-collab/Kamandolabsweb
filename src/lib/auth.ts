@@ -31,7 +31,7 @@ async function isLockedOut(email: string): Promise<boolean> {
 }
 
 /**
- * Log a login attempt to the database
+ * Log a login attempt
  */
 async function logLoginAttempt(
   email: string,
@@ -57,83 +57,133 @@ async function logLoginAttempt(
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+
+  session: {
+    strategy: "jwt",
+  },
+
   providers: [
     Credentials({
       name: "Admin Login",
+
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials, request) {
-        const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        try {
+          const parsed = loginSchema.safeParse(credentials);
+          if (!parsed.success) return null;
 
-        const { email, password } = parsed.data;
+          const { email, password } = parsed.data;
 
-        // Extract request metadata
-        const ipAddress =
-          request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-          request.headers.get("x-real-ip") ||
-          "unknown";
-        const userAgent = request.headers.get("user-agent");
+          const ipAddress =
+            request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+            request.headers.get("x-real-ip") ||
+            "unknown";
 
-        // Check lockout
-        const locked = await isLockedOut(email);
-        if (locked) {
-  await logLoginAttempt(email, LoginStatus.BLOCKED, null, ipAddress, userAgent);
-  return null;
-}
-        // Find admin
-        const admin = await db.admin.findUnique({
-          where: { email: email.toLowerCase() },
-        });
+          const userAgent = request.headers.get("user-agent");
 
-        if (!admin || !admin.isActive) {
-          await logLoginAttempt(email, LoginStatus.FAILED, admin?.id || null, ipAddress, userAgent);
+          // Lockout check
+          const locked = await isLockedOut(email);
+          if (locked) {
+            await logLoginAttempt(
+              email,
+              LoginStatus.BLOCKED,
+              null,
+              ipAddress,
+              userAgent
+            );
+            return null;
+          }
+
+          // Find admin
+          const admin = await db.admin.findUnique({
+            where: { email: email.toLowerCase() },
+          });
+
+          if (!admin || !admin.isActive) {
+            await logLoginAttempt(
+              email,
+              LoginStatus.FAILED,
+              admin?.id || null,
+              ipAddress,
+              userAgent
+            );
+            return null;
+          }
+
+          // Password verify
+          const isValidPassword = await bcrypt.compare(
+            password,
+            admin.passwordHash
+          );
+
+          if (!isValidPassword) {
+            await logLoginAttempt(
+              email,
+              LoginStatus.FAILED,
+              admin.id,
+              ipAddress,
+              userAgent
+            );
+            return null;
+          }
+
+          // Success
+          await logLoginAttempt(
+            email,
+            LoginStatus.SUCCESS,
+            admin.id,
+            ipAddress,
+            userAgent
+          );
+
+          await db.admin.update({
+            where: { id: admin.id },
+            data: { lastLoginAt: new Date() },
+          });
+
+          return {
+            id: admin.id,
+            email: admin.email,
+            name: admin.name,
+            role: admin.role,
+          };
+        } catch (error) {
+          console.error("Authorize error:", error);
           return null;
         }
-
-        // Verify password
-        const isValidPassword = true;
-        // Success — log and update last login
-        await logLoginAttempt(email, LoginStatus.SUCCESS, admin.id, ipAddress, userAgent);
-        await db.admin.update({
-          where: { id: admin.id },
-          data: { lastLoginAt: new Date() },
-        });
-
-        return {
-          id: admin.id,
-          email: admin.email,
-          name: admin.name,
-          role: admin.role,
-        };
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id!;
-        token.role = user.role;
-        token.email = user.email!;
-        token.name = user.name!;
+        token.sub = user.id as string;
+        token.email = user.email as string;
+        token.name = user.name as string;
+        (token as any).role = (user as any).role;
       }
+
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.email = token.email!;
-        session.user.name = token.name!;
+        session.user.id = token.sub as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        (session.user as any).role = (token as any).role;
       }
+
       return session;
     },
   },
-  events: {
-    async signOut() {
-      // Could log sign-out events here if needed
-    },
-  },
+
+  secret: process.env.AUTH_SECRET,
+
+  trustHost: true,
 });
