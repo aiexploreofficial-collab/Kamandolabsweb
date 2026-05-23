@@ -88,13 +88,21 @@ export default function Navbar() {
             scrolled ? "h-14 lg:h-16" : "h-18 lg:h-22"
           )}>
             {/* Logo */}
-            <Link href="/" className="flex items-center group relative z-50 w-[90px] h-full lg:w-[120px]">
-              <div className="absolute top-1 w-[90px] h-[130px] lg:top-2 lg:w-[120px] lg:h-[170px]">
+            <Link href="/" className={cn(
+              "flex items-center group relative z-50 h-full transition-all duration-500",
+              scrolled ? "w-[50px] lg:w-[65px]" : "w-[90px] lg:w-[120px]"
+            )}>
+              <div className={cn(
+                "absolute transition-all duration-500",
+                scrolled 
+                  ? "top-1 w-[50px] h-[70px] lg:w-[65px] lg:h-[90px]" 
+                  : "top-1 w-[90px] h-[130px] lg:top-2 lg:w-[120px] lg:h-[170px]"
+              )}>
                 <Image
                   src="/images/logo.png"
                   alt="Komando Labs Logo"
                   fill
-                  sizes="(max-width: 768px) 90px, 120px"
+                  sizes="(max-width: 768px) 120px, 170px"
                   className="object-contain filter brightness-100 object-top group-hover:scale-105 transition-transform duration-300"
                   priority
                 />
