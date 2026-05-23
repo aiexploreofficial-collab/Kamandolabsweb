@@ -80,10 +80,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // Check lockout
         const locked = await isLockedOut(email);
         if (locked) {
-          await logLoginAttempt(email, LoginStatus.BLOCKED, null, ipAddress, userAgent);
-          throw new Error("Account temporarily locked. Too many failed attempts.");
-        }
-
+  await logLoginAttempt(email, LoginStatus.BLOCKED, null, ipAddress, userAgent);
+  return null;
+}
         // Find admin
         const admin = await db.admin.findUnique({
           where: { email: email.toLowerCase() },
