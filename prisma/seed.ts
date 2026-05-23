@@ -28,31 +28,29 @@ async function main() {
 
   // 1. Seed Admin User
   const adminEmail = 'admin@komandolabs.com';
-  const existingAdmin = await prisma.admin.findUnique({
-    where: { email: adminEmail },
-  });
+  console.log(`Seeding admin user: ${adminEmail}`);
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash('Admin@123', salt);
 
   let adminId: string;
 
-  if (!existingAdmin) {
-    console.log(`Creating admin user: ${adminEmail}`);
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash('Admin@123', salt);
-    
-    const newAdmin = await prisma.admin.create({
-      data: {
-        email: adminEmail,
-        passwordHash,
-        name: 'Komando Admin',
-        role: AdminRole.SUPER_ADMIN,
-        isActive: true,
-      },
-    });
-    adminId = newAdmin.id;
-  } else {
-    console.log(`Admin user ${adminEmail} already exists.`);
-    adminId = existingAdmin.id;
-  }
+  const admin = await prisma.admin.upsert({
+    where: { email: adminEmail },
+    update: {
+      passwordHash,
+      name: 'Komando Admin',
+      role: AdminRole.SUPER_ADMIN,
+      isActive: true,
+    },
+    create: {
+      email: adminEmail,
+      passwordHash,
+      name: 'Komando Admin',
+      role: AdminRole.SUPER_ADMIN,
+      isActive: true,
+    },
+  });
+  adminId = admin.id;
 
   // 2. Seed Categories
   console.log('Seeding categories...');

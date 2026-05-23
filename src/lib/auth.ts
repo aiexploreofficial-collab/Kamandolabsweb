@@ -78,12 +78,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           const { email, password } = parsed.data;
 
-          const ipAddress =
-            request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-            request.headers.get("x-real-ip") ||
-            "unknown";
+          let ipAddress = "unknown";
+          let userAgent: string | null = "unknown";
 
-          const userAgent = request.headers.get("user-agent");
+          if (request && typeof request === "object") {
+            try {
+              if (request instanceof Request) {
+                ipAddress =
+                  request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+                  request.headers.get("x-real-ip") ||
+                  "unknown";
+                userAgent = request.headers.get("user-agent") || "unknown";
+              } else {
+                const headersObj = (request as any).headers;
+                if (headersObj) {
+                  if (typeof headersObj.get === "function") {
+                    ipAddress =
+                      headersObj.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+                      headersObj.get("x-real-ip") ||
+                      "unknown";
+                    userAgent = headersObj.get("user-agent") || "unknown";
+                  } else {
+                    ipAddress =
+                      headersObj["x-forwarded-for"] ||
+                      headersObj["x-real-ip"] ||
+                      "unknown";
+                    userAgent = headersObj["user-agent"] || "unknown";
+                  }
+                }
+              }
+            } catch (err) {
+              console.error("Failed to parse headers from request:", err);
+            }
+          }
 
           // Lockout check
           const locked = await isLockedOut(email);
