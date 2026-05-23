@@ -89,12 +89,12 @@ export default function Navbar() {
           )}>
             {/* Logo */}
             <Link href="/" className="flex items-center group relative z-10">
-              <div className="relative w-28 h-12 lg:w-40 lg:h-16">
+              <div className="relative w-[110px] h-[110px] lg:w-[150px] lg:h-[150px] -my-6 lg:-my-10">
                 <Image
                   src="/images/logo.png"
                   alt="Komando Labs Logo"
                   fill
-                  sizes="(max-width: 768px) 112px, 160px"
+                  sizes="(max-width: 768px) 110px, 150px"
                   className="object-contain filter brightness-100 group-hover:scale-105 transition-transform duration-300"
                   priority
                 />
