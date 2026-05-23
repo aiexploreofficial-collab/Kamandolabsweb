@@ -53,13 +53,13 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-4 lg:col-span-2 lg:pr-8">
             {/* Logo */}
             <Link href="/" className="inline-flex items-center group">
-              <div className="relative w-[120px] h-[120px] lg:w-[160px] lg:h-[160px]">
+              <div className="relative w-[100px] h-[140px] lg:w-[130px] lg:h-[180px]">
                 <Image
                   src="/images/logo.png"
                   alt="Komando Labs Logo"
                   fill
-                  sizes="(max-width: 768px) 120px, 160px"
-                  className="object-contain filter brightness-100"
+                  sizes="(max-width: 768px) 100px, 130px"
+                  className="object-contain filter brightness-100 object-left"
                 />
               </div>
             </Link>
