@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Instagram,
@@ -51,13 +52,15 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-2 lg:pr-8">
             {/* Logo */}
-            <Link href="/" className="inline-flex items-center gap-2.5 group">
-              <div className="w-9 h-9 bg-red-600 rounded-none flex items-center justify-center font-display font-black text-sm text-white">
-                K
-              </div>
-              <div className="font-display font-black text-lg tracking-[0.05em] uppercase">
-                <span className="text-white">KOMANDO</span>
-                <span className="text-red-500 ml-0.5">LABS</span>
+            <Link href="/" className="inline-flex items-center group">
+              <div className="relative w-28 h-10 lg:w-32 lg:h-12">
+                <Image
+                  src="/images/logo.png"
+                  alt="Komando Labs Logo"
+                  fill
+                  sizes="(max-width: 768px) 112px, 128px"
+                  className="object-contain filter brightness-100"
+                />
               </div>
             </Link>
 

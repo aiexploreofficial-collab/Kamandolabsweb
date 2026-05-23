@@ -57,6 +57,11 @@ export const metadata: Metadata = {
     description:
       "India's premium fitness-performance supplement brand. Lab-tested, authenticity-verified.",
   },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/icon.png",
+  },
 };
 
 import { CartProvider } from "@/context/cart-context";

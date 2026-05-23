@@ -88,15 +88,16 @@ export default function Navbar() {
             scrolled ? "h-14 lg:h-16" : "h-18 lg:h-22"
           )}>
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group relative z-10">
-              <div className="relative">
-                <div className="w-9 h-9 bg-red-600 rounded-none flex items-center justify-center font-display font-black text-sm tracking-tight transition-all duration-300 group-hover:scale-105 text-white">
-                  K
-                </div>
-              </div>
-              <div className="font-display font-black text-[1.1rem] tracking-[0.05em] uppercase">
-                <span className="text-white">KOMANDO</span>
-                <span className="text-red-500 ml-0.5">LABS</span>
+            <Link href="/" className="flex items-center group relative z-10">
+              <div className="relative w-28 h-10 lg:w-32 lg:h-12">
+                <Image
+                  src="/images/logo.png"
+                  alt="Komando Labs Logo"
+                  fill
+                  sizes="(max-width: 768px) 112px, 128px"
+                  className="object-contain filter brightness-100 group-hover:scale-105 transition-transform duration-300"
+                  priority
+                />
               </div>
             </Link>
 
