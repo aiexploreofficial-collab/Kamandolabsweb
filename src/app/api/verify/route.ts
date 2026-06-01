@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       "unknown";
     const userAgent = request.headers.get("user-agent");
 
-    // 1. Fetch code hash record
+    // 1. Fetch code hash record — supports both legacy variant and new manual entries
     const verCode = await db.verificationCode.findUnique({
       where: { codeHash },
       include: {
@@ -33,6 +33,23 @@ export async function POST(request: Request) {
         },
       },
     });
+
+    // Helper to resolve product info from either legacy or manual fields
+    const resolveProductInfo = () => {
+      if (!verCode) return {};
+      if (verCode.productName) {
+        return {
+          productName: verCode.productName,
+          variantName: verCode.flavour ? `${verCode.flavour} — ${verCode.size || ""}` : verCode.size || null,
+          batch: verCode.batchCode,
+        };
+      }
+      return {
+        productName: verCode.productVariant?.product?.name ?? "Komando Labs Product",
+        variantName: verCode.productVariant?.name ?? null,
+        batch: verCode.batch,
+      };
+    };
 
     // Case A: Invalid Code
     if (!verCode) {
@@ -62,9 +79,7 @@ export async function POST(request: Request) {
       if (verCode.verifiedPhone === cleanPhone) {
         return NextResponse.json({
           status: "VALID_ALREADY_VERIFIED_BY_YOU",
-          productName: verCode.productVariant.product.name,
-          variantName: verCode.productVariant.name,
-          batch: verCode.batch,
+          ...resolveProductInfo(),
           verifiedAt: verCode.verifiedAt,
         });
       }
@@ -119,9 +134,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       status: "VALID",
       success: true,
-      productName: verCode.productVariant.product.name,
-      variantName: verCode.productVariant.name,
-      batch: verCode.batch,
+      ...resolveProductInfo(),
       message: "Congratulations! Your Komando Labs product is 100% authentic and certified by our quality laboratories. Fuel your performance with total peace of mind.",
     });
 

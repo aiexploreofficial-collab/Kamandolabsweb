@@ -475,23 +475,34 @@ model ShippingRule {
 // ============================================================================
 
 /// Verification scratch codes — ONLY hash stored, never plaintext
-/// Admin generates 1–2000 codes per batch, linked to product variant
+/// Admin generates 1–2000 codes per batch.
+/// Supports both legacy (productVariantId) and new manual entry (productName/flavour/size/batchCode) modes.
 model VerificationCode {
   id               String    @id @default(uuid()) @db.Uuid
   codeHash         String    @unique @map("code_hash") // SHA-256 hash of scratch code
-  productVariantId String    @map("product_variant_id") @db.Uuid
-  batch            String?   // Optional batch identifier
+
+  // Legacy relation — nullable for backward compat; new codes will have this as null
+  productVariantId String?   @map("product_variant_id") @db.Uuid
+
+  // Manual product details — new system (no foreign key dependency)
+  productName      String?   @map("product_name")
+  flavour          String?   @map("flavour")
+  size             String?   @map("size")
+  batchCode        String?   @map("batch_code")
+
+  batch            String?   // Legacy batch identifier
   isUsed           Boolean   @default(false) @map("is_used")
   verifiedAt       DateTime? @map("verified_at")
   verifiedPhone    String?   @map("verified_phone")
   createdAt        DateTime  @default(now()) @map("created_at")
 
   // Relations
-  productVariant ProductVariant           @relation(fields: [productVariantId], references: [id])
+  productVariant ProductVariant?          @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
   attemptLogs    VerificationAttemptLog[]
 
   @@index([productVariantId])
-  @@index([batch])
+  @@index([productName])
+  @@index([batchCode])
   @@index([isUsed])
   @@map("verification_codes")
 }

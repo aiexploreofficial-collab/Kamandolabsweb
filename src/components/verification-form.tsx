@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, ShieldAlert, Loader2, Sparkles, Phone, HelpCircle } from "lucide-react";
+import { ShieldCheck, ShieldAlert, Loader2, Sparkles, Phone, Package, Beaker, Weight, Hash } from "lucide-react";
 import { isValidIndianPhone } from "@/lib/utils";
 
 export default function VerificationForm() {
@@ -77,35 +77,83 @@ export default function VerificationForm() {
           >
             {result.status === "VALID" || result.status === "VALID_ALREADY_VERIFIED_BY_YOU" ? (
               <div className="text-center">
+                {/* Success Icon */}
                 <div className="w-16 h-16 bg-emerald-950/10 border border-emerald-900/50 rounded-none flex items-center justify-center mx-auto mb-6">
                   <Sparkles className="w-8 h-8 text-emerald-400" />
                 </div>
 
-                <h2 className="text-xl font-display font-black text-emerald-400 tracking-tight mb-2 uppercase italic">
-                  Authentic Product Verified
+                <h2 className="text-xl font-display font-black text-emerald-400 tracking-tight mb-1 uppercase italic">
+                  ✓ 100% Genuine Product
                 </h2>
-
                 <p className="text-xs text-neutral-400 leading-relaxed max-w-sm mx-auto mb-6">
                   {result.message || "Your authenticity check succeeded. This product matches our high laboratory standards."}
                 </p>
 
-                <div className="bg-[#161616] border border-neutral-800 p-4 rounded-none text-left text-xs mb-6 flex flex-col gap-2">
-                  <div>
-                    <span className="text-neutral-500 block uppercase font-bold text-[9px]">Product</span>
-                    <span className="font-bold text-white mt-0.5 block uppercase italic">{result.productName}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 mt-1 pt-2 border-t border-neutral-800">
-                    <div>
-                      <span className="text-neutral-500 block uppercase font-bold text-[9px]">Specification</span>
-                      <span className="font-bold text-white mt-0.5 block uppercase">{result.variantName}</span>
+                {/* Product Detail Card */}
+                <div className="bg-[#161616] border border-emerald-900/30 p-5 rounded-none text-left mb-6 flex flex-col gap-3">
+
+                  {/* Product Name — always shown */}
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 bg-emerald-950/20 border border-emerald-900/30 rounded-none mt-0.5">
+                      <Package className="w-3.5 h-3.5 text-emerald-500" />
                     </div>
                     <div>
-                      <span className="text-neutral-500 block uppercase font-bold text-[9px]">Batch Code</span>
-                      <span className="font-bold text-white mt-0.5 block font-mono">
-                        {result.batch || "KMD-L2"}
-                      </span>
+                      <span className="text-neutral-500 block uppercase font-bold text-[9px] tracking-wider">Product</span>
+                      <span className="font-black text-white mt-0.5 block uppercase italic text-sm">{result.productName}</span>
                     </div>
                   </div>
+
+                  {/* Flavour — only if available */}
+                  {result.flavour && (
+                    <div className="flex items-start gap-3 pt-3 border-t border-neutral-800">
+                      <div className="p-1.5 bg-emerald-950/20 border border-emerald-900/30 rounded-none mt-0.5">
+                        <Beaker className="w-3.5 h-3.5 text-emerald-500" />
+                      </div>
+                      <div>
+                        <span className="text-neutral-500 block uppercase font-bold text-[9px] tracking-wider">Flavour</span>
+                        <span className="font-bold text-white mt-0.5 block uppercase text-xs">{result.flavour}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Size — only if available */}
+                  {result.size && (
+                    <div className="flex items-start gap-3 pt-3 border-t border-neutral-800">
+                      <div className="p-1.5 bg-emerald-950/20 border border-emerald-900/30 rounded-none mt-0.5">
+                        <Weight className="w-3.5 h-3.5 text-emerald-500" />
+                      </div>
+                      <div>
+                        <span className="text-neutral-500 block uppercase font-bold text-[9px] tracking-wider">Size / Weight</span>
+                        <span className="font-bold text-white mt-0.5 block uppercase text-xs">{result.size}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Variant Name — for legacy codes */}
+                  {!result.size && result.variantName && (
+                    <div className="flex items-start gap-3 pt-3 border-t border-neutral-800">
+                      <div className="p-1.5 bg-emerald-950/20 border border-emerald-900/30 rounded-none mt-0.5">
+                        <Weight className="w-3.5 h-3.5 text-emerald-500" />
+                      </div>
+                      <div>
+                        <span className="text-neutral-500 block uppercase font-bold text-[9px] tracking-wider">Specification</span>
+                        <span className="font-bold text-white mt-0.5 block uppercase text-xs">{result.variantName}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Batch Code — only if available */}
+                  {result.batchCode && (
+                    <div className="flex items-start gap-3 pt-3 border-t border-neutral-800">
+                      <div className="p-1.5 bg-emerald-950/20 border border-emerald-900/30 rounded-none mt-0.5">
+                        <Hash className="w-3.5 h-3.5 text-emerald-500" />
+                      </div>
+                      <div>
+                        <span className="text-neutral-500 block uppercase font-bold text-[9px] tracking-wider">Batch Code</span>
+                        <span className="font-bold text-white mt-0.5 block font-mono text-xs tracking-wider">{result.batchCode}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <button
@@ -118,10 +166,10 @@ export default function VerificationForm() {
             ) : (
               <div className="text-center">
                 <div className="w-16 h-16 bg-red-950/10 border border-red-900/50 rounded-none flex items-center justify-center mx-auto mb-6">
-                  <ShieldAlert className="w-8 h-8 text-red-650" />
+                  <ShieldAlert className="w-8 h-8 text-red-500" />
                 </div>
 
-                <h2 className="text-xl font-display font-black text-red-650 tracking-tight mb-3 uppercase italic">
+                <h2 className="text-xl font-display font-black text-red-500 tracking-tight mb-3 uppercase italic">
                   Already Verified
                 </h2>
 
@@ -148,7 +196,7 @@ export default function VerificationForm() {
             className="flex flex-col gap-5"
           >
             {error && (
-              <div className="bg-red-950/10 border border-red-900/50 text-red-600 p-3.5 rounded-none text-xs flex items-start gap-2">
+              <div className="bg-red-950/10 border border-red-900/50 text-red-500 p-3.5 rounded-none text-xs flex items-start gap-2">
                 <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -169,7 +217,7 @@ export default function VerificationForm() {
             </div>
 
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-2 block flex items-center gap-1">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-2 flex items-center gap-1 block">
                 <Phone className="w-3.5 h-3.5 text-red-600" /> Phone Number (To log verification audit)
               </label>
               <input
